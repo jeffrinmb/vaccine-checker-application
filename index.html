@@ -9,10 +9,17 @@
   </head>
   <body>
     <div class="container">
-      <label for="">States</label>
+      <label for="states-name">States</label>
       <select name="states-name" id="states-name"></select>
-      <label for="">Districts</label>
+      <label for="district-name">Districts</label>
       <select name="district-name" id="district-name"></select>
+      <label for="choose-date">Date</label>
+      <input name="choose-date" id="choose-date" type="date" />
+      <button id="btn-check-district">Check Slots</button>
+      <div id="output"></div>
+      <div class="response-div">
+        <table id="tbl-response"></table>
+      </div>
     </div>
     <script src="app.js"></script>
   </body>
