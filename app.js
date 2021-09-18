@@ -36,17 +36,21 @@ const listStates = () => {
 };
 
 const listDistricts = stateID => {
-  fetch(covinAPI.districtListAPI + stateID)
-    .then(response => response.json())
-    .then(json => {
-      let listOfDistricts = "<option selected value='0'>Select</option>";
-      for (const district of json.districts) {
-        listOfDistricts =
-          listOfDistricts +
-          `<option value='${district.district_id}'>${district.district_name}</option>`;
-      }
-      districtDropdown.innerHTML = listOfDistricts;
-    });
+  let listOfDistricts = "<option selected value='0'>Select</option>";
+  districtDropdown.innerHTML = listOfDistricts;
+  if (stateID !== '0') {
+    fetch(covinAPI.districtListAPI + stateID)
+      .then(response => response.json())
+      .then(json => {
+        for (const district of json.districts) {
+          listOfDistricts =
+            listOfDistricts +
+            `<option value='${district.district_id}'>${district.district_name}</option>`;
+        }
+        districtDropdown.innerHTML = listOfDistricts;
+      });
+  }
+  districtDropdown.innerHTML = listOfDistricts;
 };
 
 const displayMessage = message => {
@@ -83,32 +87,78 @@ const listSlotsByDistrict = () => {
     .then(json => displayCentersAsTable(json));
 };
 
-const displayCentersAsTable = responseObj => {
-  let htmlContent = `<tr><th>Center</th>`;
-  let dateHead;
+const getNextSevenDays = () => {
+  let dateHead = [];
   for (let i = 0; i < 7; i++) {
     let dateSplit = selectedValuesBasedonDistrict.selectedDate.split('-');
-    dateHead = new Date(dateSplit[2], +dateSplit[1] - 1, +dateSplit[0] + i);
-    htmlContent =
-      htmlContent +
-      `<th>${dateHead.toLocaleDateString('en-GB').split('/').join('-')}</th>`;
+    dateHead.push(
+      new Date(dateSplit[2], +dateSplit[1] - 1, +dateSplit[0] + i)
+        .toLocaleDateString('en-GB')
+        .split('/')
+        .join('-')
+    );
+  }
+  return dateHead;
+};
+
+const createAvailabiltyColumn = (center, dateShown) => {
+  const feeType = center.fee_type;
+  let vaccineType = '';
+  let vaccineFee = '';
+  let minAgeLimit = '';
+  let maxAgeLimit = '';
+  let allowAllAge = '';
+  let availableDose1 = '';
+  let availableDose2 = '';
+  let htmlColumn = '<td>';
+  for (const session of center.sessions) {
+    if (session.date === dateShown) {
+      vaccineType = session.vaccine;
+      allowAllAge = session.allow_all_age;
+      availableDose1 = session.available_capacity_dose1;
+      availableDose2 = session.available_capacity_dose2;
+      if (!allowAllAge) {
+        minAgeLimit = session.min_age_limit;
+        maxAgeLimit = session?.max_age_limit ?? '';
+      } else {
+        minAgeLimit = session.min_age_limit;
+      }
+      if (feeType === 'Paid') {
+        for (const fees of center.vaccine_fees) {
+          if (fees.vaccine === vaccineType) {
+            vaccineFee = fees.fee;
+          }
+        }
+      } else {
+        vaccineFee = 'Free';
+      }
+      htmlColumn =
+        htmlColumn +
+        `<div><div>${vaccineType} (${minAgeLimit}${
+          maxAgeLimit !== '' ? ' - ' + maxAgeLimit : '+'
+        })</div>
+        <div>Dose 1: <span>${availableDose1}</span> Dose 2: <span>${availableDose2}</span></div>
+        <div>Fees: <span>${vaccineFee}</span></div>
+        </div>`;
+    }
+  }
+  htmlColumn = htmlColumn + '</td>';
+  return htmlColumn;
+};
+
+const displayCentersAsTable = responseObj => {
+  let htmlContent = `<tr><th>Center</th>`;
+  for (const dateShown of getNextSevenDays()) {
+    htmlContent = htmlContent + `<th>${dateShown}</th>`;
   }
   htmlContent = htmlContent + '</tr>';
   for (const center of responseObj.centers) {
-    htmlContent = htmlContent + `<tr><th>${center.name}</th>`;
-    for (let i = 0; i < 7; i++) {
-      let dateSplit = selectedValuesBasedonDistrict.selectedDate.split('-');
-      dateHead = new Date(dateSplit[2], +dateSplit[1] - 1, +dateSplit[0] + i)
-        .toLocaleDateString('en-GB')
-        .split('/')
-        .join('-');
-      let count = 0;
-      for (const session of center.sessions) {
-        if (session.date === dateHead) {
-          count = count + session.available_capacity;
-        }
-      }
-      htmlContent = htmlContent + `<td>${count}</td>`;
+    htmlContent =
+      htmlContent +
+      `<tr><th><div>${center.name}</div>
+      <div>${center.fee_type}</div></th>`;
+    for (const dateShown of getNextSevenDays()) {
+      htmlContent = htmlContent + createAvailabiltyColumn(center, dateShown);
     }
     htmlContent = htmlContent + `</tr>`;
   }
@@ -117,9 +167,7 @@ const displayCentersAsTable = responseObj => {
 
 stateDropdown.addEventListener('change', event => {
   selectedValuesBasedonDistrict.stateCode = event.target.value;
-  if (selectedValuesBasedonDistrict.stateCode !== '0') {
-    listDistricts(selectedValuesBasedonDistrict.stateCode);
-  }
+  listDistricts(selectedValuesBasedonDistrict.stateCode);
 });
 
 districtDropdown.addEventListener('change', event => {
