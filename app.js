@@ -174,7 +174,7 @@ const createAvailabiltyColumn = (center, dateShown) => {
         `<div class='vaccine-container'><div class='vaccine-type'>${vaccineType} <span class='age-limit'>(${minAgeLimit}${
           maxAgeLimit !== '' ? ' - ' + maxAgeLimit : '+'
         })</span></div>
-        <div><span class='dose-count'>Dose 1: <span class='dose-one'>${availableDose1}</span> Dose 2: <span class='dose-two'>${availableDose2}</span></span></div>
+        <div class='div-dose-count'><span class='dose-count'>Dose 1: <span class='dose-one'>${availableDose1}</span> Dose 2: <span class='dose-two'>${availableDose2}</span></span></div>
         <div class='div-fees'>Fees: <span class='fees-amount'>${vaccineFee}</span></div>
         </div>`;
     }

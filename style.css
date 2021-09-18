@@ -8,6 +8,7 @@
   --primary-font-color: #ffffff;
   --primary-back: #e5e7eb;
   --block-color: #d1d5db;
+  --light-blue: #818cf8;
 }
 
 html,
@@ -49,6 +50,7 @@ body {
   margin: auto;
   text-align: center;
   padding-top: 2rem;
+  min-height: 53vh;
 }
 
 .container label,
@@ -60,9 +62,31 @@ body {
 
 .container select,
 .container input {
-  width: 40%;
   text-align: center;
   font-family: var(--primary-font);
+  border: 1px solid var(--primary-heading-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.container button {
+  width: 45%;
+  padding: 0.5rem;
+  background-color: var(--primary-heading-color);
+  color: var(--primary-font-color);
+  font-size: 1rem;
+  border: 1px solid var(--primary-heading-color);
+  border-radius: 0.5rem;
+}
+
+.container select {
+  width: 45%;
+}
+
+.container input {
+  width: 44%;
 }
 
 .required:after {
@@ -72,6 +96,7 @@ body {
 
 table {
   margin: auto;
+  margin-bottom: 1rem;
 }
 
 table,
@@ -84,7 +109,13 @@ td {
 th,
 tr,
 td {
-  border: 1px solid black;
+  border: 1px solid var(--primary-heading-color);
+}
+
+th {
+  color: var(--primary-font-color);
+  background-color: var(--primary-heading-color);
+  border-color: black;
 }
 
 .vaccine-container {
@@ -104,4 +135,43 @@ td {
 
 #output {
   color: red;
+  margin: 1rem;
+}
+
+.fees-type {
+  padding-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.div-dose-count {
+  background-color: var(--light-blue);
+  border-radius: 0.5rem;
+}
+
+#footer-section {
+  background-color: var(--primary-heading-color);
+  color: var(--primary-font-color);
+  padding: 1rem;
+  text-align: center;
+}
+
+#footer-section .social-list {
+  list-style: none;
+  padding-inline-start: 0px;
+}
+
+#footer-section .social-list .list-item {
+  display: inline;
+}
+
+#footer-section .social-list .social-link {
+  text-decoration: none;
+  color: var(--primary-font-color);
+  margin: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+#footer-section .social-list .social-link .social-link-logo {
+  max-width: 2.5rem;
 }
