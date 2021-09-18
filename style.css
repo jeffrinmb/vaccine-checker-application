@@ -3,5 +3,10 @@ th,
 tr,
 td {
   border-collapse: collapse;
+}
+
+th,
+tr,
+td {
   border: 1px solid black;
 }

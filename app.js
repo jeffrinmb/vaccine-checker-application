@@ -1,22 +1,36 @@
 'use strict';
 
+const btnByDist = document.querySelector('#btn-by-dist');
+const btnByPIN = document.querySelector('#btn-by-pin');
+const divDistrict = document.querySelector('#search-by-district');
+const divPinCode = document.querySelector('#search-by-pincode');
 const stateDropdown = document.querySelector('#states-name');
 const districtDropdown = document.querySelector('#district-name');
 const chooseDate = document.querySelector('#choose-date');
 const btnCheckBasedOnDistrict = document.querySelector('#btn-check-district');
+const txtPinCode = document.querySelector('#pin-code');
+const chooseDatePin = document.querySelector('#choose-date-pin');
+const btnCheckBasedOnPin = document.querySelector('#btn-check-pin');
 const outputMessage = document.querySelector('#output');
-const tableDistrictWise = document.querySelector('#tbl-response');
+const tableData = document.querySelector('#tbl-response');
 
 const covinAPI = {
   stateListAPI: 'https://cdn-api.co-vin.in/api/v2/admin/location/states',
   districtListAPI: 'https://cdn-api.co-vin.in/api/v2/admin/location/districts/',
   calenderByDistrict:
     'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict',
+  calenderByPin:
+    'https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin',
 };
 
 const selectedValuesBasedonDistrict = {
   stateCode: '',
   districtCode: '',
+  selectedDate: '',
+};
+
+const selectedValuesBasedonPin = {
+  pinCode: '',
   selectedDate: '',
 };
 
@@ -75,6 +89,17 @@ const validateFields = () => {
   return true;
 };
 
+const validateFieldsPin = () => {
+  if (
+    selectedValuesBasedonPin.pinCode === '' ||
+    selectedValuesBasedonPin.pinCode.length !== 6
+  ) {
+    displayMessage('Please enter a valid Pin Code');
+    return false;
+  }
+  return true;
+};
+
 const listSlotsByDistrict = () => {
   fetch(
     covinAPI.calenderByDistrict +
@@ -84,13 +109,25 @@ const listSlotsByDistrict = () => {
       selectedValuesBasedonDistrict.selectedDate
   )
     .then(response => response.json())
-    .then(json => displayCentersAsTable(json));
+    .then(json => displayCentersAsTable(json, selectedValuesBasedonDistrict));
 };
 
-const getNextSevenDays = () => {
+const listSlotsByPin = () => {
+  fetch(
+    covinAPI.calenderByPin +
+      '?pincode=' +
+      selectedValuesBasedonPin.pinCode +
+      '&date=' +
+      selectedValuesBasedonPin.selectedDate
+  )
+    .then(response => response.json())
+    .then(json => displayCentersAsTable(json, selectedValuesBasedonPin));
+};
+
+const getNextSevenDays = dataObj => {
   let dateHead = [];
   for (let i = 0; i < 7; i++) {
-    let dateSplit = selectedValuesBasedonDistrict.selectedDate.split('-');
+    let dateSplit = dataObj.selectedDate.split('-');
     dateHead.push(
       new Date(dateSplit[2], +dateSplit[1] - 1, +dateSplit[0] + i)
         .toLocaleDateString('en-GB')
@@ -134,11 +171,11 @@ const createAvailabiltyColumn = (center, dateShown) => {
       }
       htmlColumn =
         htmlColumn +
-        `<div><div>${vaccineType} (${minAgeLimit}${
+        `<div><div class='vaccine-type'>${vaccineType} <span class='age-limit'>(${minAgeLimit}${
           maxAgeLimit !== '' ? ' - ' + maxAgeLimit : '+'
-        })</div>
-        <div>Dose 1: <span>${availableDose1}</span> Dose 2: <span>${availableDose2}</span></div>
-        <div>Fees: <span>${vaccineFee}</span></div>
+        })</span></div>
+        <div><span class='dose-count'>Dose 1: <span class='dose-one'>${availableDose1}</span> Dose 2: <span class='dose-two'>${availableDose2}</span></span></div>
+        <div class='div-fees'>Fees: <span class='fees-amount'>${vaccineFee}</span></div>
         </div>`;
     }
   }
@@ -146,23 +183,39 @@ const createAvailabiltyColumn = (center, dateShown) => {
   return htmlColumn;
 };
 
-const displayCentersAsTable = responseObj => {
+const displayCentersAsTable = (responseObj, dataObj) => {
+  if (responseObj.centers.length === 0) {
+    displayMessage('No Centers Available');
+    tableData.innerHTML = '';
+    tableData.style.display = 'none';
+    return;
+  }
   let htmlContent = `<tr><th>Center</th>`;
-  for (const dateShown of getNextSevenDays()) {
+  for (const dateShown of getNextSevenDays(dataObj)) {
     htmlContent = htmlContent + `<th>${dateShown}</th>`;
   }
   htmlContent = htmlContent + '</tr>';
   for (const center of responseObj.centers) {
     htmlContent =
       htmlContent +
-      `<tr><th><div>${center.name}</div>
-      <div>${center.fee_type}</div></th>`;
-    for (const dateShown of getNextSevenDays()) {
+      `<tr><th><div class='center-name'>${center.name}</div>
+      <div class='fees-type'>${center.fee_type}</div></th>`;
+    for (const dateShown of getNextSevenDays(dataObj)) {
       htmlContent = htmlContent + createAvailabiltyColumn(center, dateShown);
     }
     htmlContent = htmlContent + `</tr>`;
   }
-  tableDistrictWise.innerHTML = htmlContent;
+  tableData.innerHTML = htmlContent;
+};
+
+const selectChoosedDate = dateElement => {
+  let dateVal;
+  if (dateElement.value === '') {
+    dateVal = new Date();
+  } else {
+    dateVal = new Date(dateElement.value);
+  }
+  return dateVal.toLocaleDateString('en-GB').split('/').join('-');
 };
 
 stateDropdown.addEventListener('change', event => {
@@ -176,19 +229,42 @@ districtDropdown.addEventListener('change', event => {
 
 btnCheckBasedOnDistrict.addEventListener('click', () => {
   displayMessage('');
-  let dateVal;
-  if (chooseDate.value === '') {
-    dateVal = new Date();
-  } else {
-    dateVal = new Date(chooseDate.value);
-  }
-  selectedValuesBasedonDistrict.selectedDate = dateVal
-    .toLocaleDateString('en-GB')
-    .split('/')
-    .join('-');
+  tableData.style.display = 'none';
+  selectedValuesBasedonDistrict.selectedDate = selectChoosedDate(chooseDate);
   if (validateFields()) {
+    tableData.style.display = 'block';
     listSlotsByDistrict();
   }
 });
 
-listStates();
+btnCheckBasedOnPin.addEventListener('click', () => {
+  displayMessage('');
+  tableData.style.display = 'none';
+  selectedValuesBasedonPin.selectedDate = selectChoosedDate(chooseDatePin);
+  selectedValuesBasedonPin.pinCode = txtPinCode.value;
+  if (validateFieldsPin()) {
+    tableData.style.display = 'block';
+    listSlotsByPin();
+  }
+});
+
+btnByDist.addEventListener('click', () => {
+  mainFunction('block', 'none');
+});
+
+btnByPIN.addEventListener('click', () => {
+  mainFunction('none', 'block');
+});
+
+const mainFunction = (dispValueOne, dispValueTwo) => {
+  divDistrict.style.display = dispValueOne;
+  divPinCode.style.display = dispValueTwo;
+  listStates();
+  chooseDate.value = '';
+  txtPinCode.value = '';
+  chooseDatePin.value = '';
+  displayMessage('');
+  tableData.innerHTML = '';
+};
+
+mainFunction('block', 'none');
