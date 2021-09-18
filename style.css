@@ -1,3 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Questrial&family=Roboto:wght@400;700;900&display=swap');
+
+:root {
+  --primary-font-one: 'Roboto', sans-serif;
+  --primary-font: 'Questrial', sans-serif;
+  --primary-heading-color: #3730a3;
+  --primary-font-color: #ffffff;
+  --primary-back: #e5e7eb;
+  --block-color: #d1d5db;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--primary-font);
+  margin: 0;
+  background-color: var(--primary-back);
+}
+
+#heading {
+  background-color: var(--primary-heading-color);
+  color: var(--primary-font-color);
+}
+
+#heading #heading-text {
+  font-size: 1.5rem;
+  padding: 1rem;
+}
+
+#heading #button-section {
+  text-align: right;
+  padding: 1rem;
+}
+
+#heading button {
+  background-color: transparent;
+  border: none;
+  font-family: var(--primary-font);
+  color: var(--primary-font-color);
+  font-size: 1rem;
+}
+
+.container {
+  width: 80%;
+  margin: auto;
+  text-align: center;
+  padding-top: 2rem;
+}
+
+.container label,
+.container select,
+.container input {
+  display: block;
+  margin: auto;
+}
+
+.container select,
+.container input {
+  width: 40%;
+  text-align: center;
+  font-family: var(--primary-font);
+}
+
+.required:after {
+  content: ' *';
+  color: red;
+}
+
+table {
+  margin: auto;
+}
+
 table,
 th,
 tr,
@@ -9,4 +85,23 @@ th,
 tr,
 td {
   border: 1px solid black;
+}
+
+.vaccine-container {
+  border: 0.2px solid black;
+  border-radius: 0.5rem;
+  background-color: var(--block-color);
+  margin: 0.1rem 0rem;
+}
+
+.age-limit {
+  font-size: 0.7rem;
+}
+
+.active {
+  font-weight: bold;
+}
+
+#output {
+  color: red;
 }

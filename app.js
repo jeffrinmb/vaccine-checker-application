@@ -171,7 +171,7 @@ const createAvailabiltyColumn = (center, dateShown) => {
       }
       htmlColumn =
         htmlColumn +
-        `<div><div class='vaccine-type'>${vaccineType} <span class='age-limit'>(${minAgeLimit}${
+        `<div class='vaccine-container'><div class='vaccine-type'>${vaccineType} <span class='age-limit'>(${minAgeLimit}${
           maxAgeLimit !== '' ? ' - ' + maxAgeLimit : '+'
         })</span></div>
         <div><span class='dose-count'>Dose 1: <span class='dose-one'>${availableDose1}</span> Dose 2: <span class='dose-two'>${availableDose2}</span></span></div>
@@ -220,6 +220,7 @@ const selectChoosedDate = dateElement => {
 
 stateDropdown.addEventListener('change', event => {
   selectedValuesBasedonDistrict.stateCode = event.target.value;
+  selectedValuesBasedonDistrict.districtCode = '';
   listDistricts(selectedValuesBasedonDistrict.stateCode);
 });
 
@@ -249,16 +250,28 @@ btnCheckBasedOnPin.addEventListener('click', () => {
 });
 
 btnByDist.addEventListener('click', () => {
-  mainFunction('block', 'none');
+  mainFunction('block', 'none', btnByDist, btnByPIN);
 });
 
 btnByPIN.addEventListener('click', () => {
-  mainFunction('none', 'block');
+  mainFunction('none', 'block', btnByPIN, btnByDist);
 });
 
-const mainFunction = (dispValueOne, dispValueTwo) => {
+const mainFunction = (
+  dispValueOne,
+  dispValueTwo,
+  btnElementOne,
+  btnElementTwo
+) => {
   divDistrict.style.display = dispValueOne;
   divPinCode.style.display = dispValueTwo;
+  btnElementOne.classList.add('active');
+  btnElementTwo.classList.remove('active');
+  selectedValuesBasedonDistrict.stateCode = '';
+  selectedValuesBasedonDistrict.districtCode = '';
+  selectedValuesBasedonDistrict.selectedDate = '';
+  selectedValuesBasedonPin.pinCode = '';
+  selectedValuesBasedonPin.selectedDate = '';
   listStates();
   chooseDate.value = '';
   txtPinCode.value = '';
@@ -267,4 +280,4 @@ const mainFunction = (dispValueOne, dispValueTwo) => {
   tableData.innerHTML = '';
 };
 
-mainFunction('block', 'none');
+mainFunction('block', 'none', btnByDist, btnByPIN);
