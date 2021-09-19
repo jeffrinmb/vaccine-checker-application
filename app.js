@@ -282,7 +282,9 @@ const mainFunction = (
   selectedValuesBasedonDistrict.selectedDate = '';
   selectedValuesBasedonPin.pinCode = '';
   selectedValuesBasedonPin.selectedDate = '';
-  listStates();
+  if (dispValueOne === 'block' && dispValueTwo === 'none') {
+    listStates();
+  }
   chooseDate.value = '';
   txtPinCode.value = '';
   chooseDatePin.value = '';
