@@ -34,6 +34,12 @@ const selectedValuesBasedonPin = {
   selectedDate: '',
 };
 
+const eventHandler = () => {
+  displayMessage(
+    'An error occured in fetching the data. Sorry for the inconvenience'
+  );
+};
+
 const listStates = () => {
   fetch(covinAPI.stateListAPI)
     .then(response => response.json())
@@ -46,7 +52,8 @@ const listStates = () => {
       }
       stateDropdown.innerHTML = listOfStates;
       districtDropdown.innerHTML = "<option selected value='0'>Select</option>";
-    });
+    })
+    .catch(eventHandler);
 };
 
 const listDistricts = stateID => {
@@ -62,7 +69,8 @@ const listDistricts = stateID => {
             `<option value='${district.district_id}'>${district.district_name}</option>`;
         }
         districtDropdown.innerHTML = listOfDistricts;
-      });
+      })
+      .catch(eventHandler);
   }
   districtDropdown.innerHTML = listOfDistricts;
 };
@@ -109,7 +117,8 @@ const listSlotsByDistrict = () => {
       selectedValuesBasedonDistrict.selectedDate
   )
     .then(response => response.json())
-    .then(json => displayCentersAsTable(json, selectedValuesBasedonDistrict));
+    .then(json => displayCentersAsTable(json, selectedValuesBasedonDistrict))
+    .catch(eventHandler);
 };
 
 const listSlotsByPin = () => {
@@ -121,7 +130,8 @@ const listSlotsByPin = () => {
       selectedValuesBasedonPin.selectedDate
   )
     .then(response => response.json())
-    .then(json => displayCentersAsTable(json, selectedValuesBasedonPin));
+    .then(json => displayCentersAsTable(json, selectedValuesBasedonPin))
+    .catch(eventHandler);
 };
 
 const getNextSevenDays = dataObj => {
